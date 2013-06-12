@@ -53,6 +53,14 @@ var eventHandlers = {
     state.columns[event.deleteCard.columnIndex].cards.splice(pos, 1)
     return state;
   },
+  addColumn: function (state, event) {
+    state.columns.push({
+      title: event.addColumn.title,
+      id: event.addColumn.title.replace(/ /g, "-"),
+      cards: []
+    })
+    return state;
+  },
   cardMove: function (state, event) {
     var fromColumnIndex = event.cardMove.fromColumnIndex
     var toColumnIndex = event.cardMove.toColumnIndex
@@ -91,6 +99,10 @@ var kanbanApp = function (state, event) {
   if (event.cardMove) {
     state = eventHandlers.cardMove(state, event)
   } 
+
+  if (event.addColumn) {
+    state = eventHandlers.addColumn(state, event)
+  } 
   state.otherBoards = _.keys(sites)
   return state
 }
@@ -103,10 +115,11 @@ io.sockets.on('connection', function (socket) {
       sites[event.site] = JSON.parse(JSON.stringify(defaultState));
       state = sites[event.site]
     } 
-    io.sockets.emit('state', kanbanApp(state, event)) 
+    io.sockets.emit(event.site, kanbanApp(state, event)) 
   });
 });
 
 process.on('uncaughtException', function(err) {
   console.log('Caught exception: ' + err);
+  return false; 
 });
