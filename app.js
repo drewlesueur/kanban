@@ -33,18 +33,28 @@ var state = {
   ]
 }
 
+
 var eventHandlers = {
-  
+  newCard: function (state, event) {
+    state.columns[event.newCard.columnIndex].cards.push({
+      title: event.newCard.title, 
+      id: _.uniqueId("card")
+    })
+    return state;
+  }    
 }
+
 var kanbanApp = function (state, event) {
-   
+  if (event.newCard) {
+    state = eventHandlers.newCard(state, event)
+  }  
   return state
 }
 
 io.sockets.on('connection', function (socket) {
   socket.emit('state', state);
   socket.on('appEvent', function (event) {
-    socket.emit('state', kanbanApp(state, event)) 
+    io.sockets.emit('state', kanbanApp(state, event)) 
   });
 });
 

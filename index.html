@@ -136,10 +136,10 @@ var handleDragStartCard = function (event) {
   console.log(event.dataTransfer)
 }
 
-var handleSumbitCard = function (event, columnId, el) {
-  var text = $(el).find(".new-card-input").val()
-  handle({newCard: {columnId: columnId, text: text}})
+var handleSumbitCard = function (event, columnId, columnIndex, el) {
   event.preventDefault()
+  var text = $(el).find(".new-card-input").val()
+  handle({newCard: {columnId: columnId, columnIndex: columnIndex, title: text}})
 }
 
 
@@ -147,8 +147,8 @@ var handleSumbitCard = function (event, columnId, el) {
 
 <script type="text/html" id="kanbanTemplate">
 
-  <% _.each(columns, function (column, i) { %>
-    <div data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, i, column) %>">
+  <% _.each(columns, function (column, columnIndex) { %>
+    <div data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, columnIndex, column) %>">
       <div class="column-header"><%= column.title %></div>
       <% _.each(column.cards, function (card, i) { %>
         <div class="card card-like" data-order="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
@@ -156,7 +156,7 @@ var handleSumbitCard = function (event, columnId, el) {
         </div> 
       <% }) %>
         <div class="new-card card-like">
-          <form onsubmit="handleSumbitCard(event, '<%= column.id %>', this)">
+          <form onsubmit="handleSumbitCard(event, '<%= column.id %>', <%= columnIndex %>, this)">
           <input type="text" class="new-card-input"> 
         </form>
         </div> 
