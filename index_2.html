@@ -167,12 +167,11 @@ var handleSumbitCard = function (event, columnId, columnIndex, el) {
   <% _.each(columns, function (column, columnIndex) { %>
     <div data-column-index="<%= columnIndex %>" data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, columnIndex, column) %>">
       <div class="column-header" data-column-index="<%= columnIndex %>" >
-
          <a style="font-size: 12px;" href="javascript:handle({site: site, deleteColumn: {columnIndex: <%= columnIndex %>}}); void(0)">x</a>
         <%= column.title %>
       </div>
       <% _.each(column.cards, function (card, i) { %>
-        <div class="card card-like" data-column-index="<%= columnIndex %>" data-card-index="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
+        <div class="card card-like" data-column-index="<%= columnIndex %>" data-card-index="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)" ondblclick="handle({site: site, moveCardOver: {columnIndex: <%= columnIndex %>, cardIndex: <%= i %>}})">
           <a href="javascript:handle({site: site, deleteCard: {columnIndex: <%= columnIndex %>, cardIndex: <%= i %>}}); void(0)">x</a>
           <%= card.title %>
         </div> 

@@ -58,6 +58,19 @@ var eventHandlers = {
     state.columns.splice(pos, 1)
     return state;
   },
+  moveCardOver: function (state, event) {
+    var columnIndex = event.moveCardOver.columnIndex
+    var cardIndex = event.moveCardOver.cardIndex
+   
+    var oldColumn = state.columns[columnIndex]
+    var newColumn = state.columns[columnIndex + 1]
+    if (!newColumn) {
+      newColumn = state.columns[0]
+    }
+    
+    newColumn.cards.push(oldColumn.cards.splice(cardIndex, 1)[0]) 
+    return state;
+  },
   addColumn: function (state, event) {
     state.columns.push({
       title: event.addColumn.title,
@@ -104,6 +117,10 @@ var kanbanApp = function (state, event) {
 
   if (event.deleteColumn) {
     state = eventHandlers.deleteColumn(state, event)
+  }
+
+  if (event.moveCardOver) {
+    state = eventHandlers.moveCardOver(state, event)
   }
 
 
