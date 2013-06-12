@@ -1,3 +1,4 @@
+//TODO: look at "Operational Transformation" libraries
 _ = require("./underscore.js")
 var io = require('socket.io').listen(8011);
 
@@ -38,15 +39,23 @@ var eventHandlers = {
   newCard: function (state, event) {
     state.columns[event.newCard.columnIndex].cards.push({
       title: event.newCard.title, 
-      id: _.uniqueId("card")
     })
     return state;
   },
   cardMove: function (state, event) {
+    var fromCards = state.columns[event.cardMove.fromColumnIndex].cards
+    var toCards = state.columns[event.cardMove.toColumnIndex].cards
+
+    var fromPos = event.cardMove.fromCardIndex
+    var toPos = event.cardMove.toCardIndex
+   
+    // splice out of fromCards into toCards
+    toCards.splice.apply(toCards, [toPos, 0].concat(
+      fromCards.splice(fromPos, 1)
+    ))
+
     return state;
-    state.columns[event.cardMove.toColumnIndex].cards.splice(
-      //state.columns[event.]
-    )
+    
   } 
 }
 
