@@ -68,9 +68,59 @@ var getColumnStyle = function (columns, i, column, width) {
   return style;
 }
 
-var handleDropColumn = function (event) {
+var findClosestCardAbove = function (x, y, el) {
+  for (i = y; i >= 0; i-=5) {
+    var newEl = document.elementFromPoint(x, i)
+    if (newEl != el && $(newEl).hasClass("card")) {
+      return {card: newEl, distance: i} 
+    }
+  } 
+  return {card: null, distance: Infinity}
+}
+
+var findClosestCardBelow = function (x, y, el) {
+  var pageHeight = $(document).height() || 5000
+  for (i = y; i <= pageHeight; i+=5) {
+    var newEl = document.elementFromPoint(x, i)
+    if (newEl != el && $(newEl).hasClass("card")) {
+      return {card: newEl, distance: i} 
+    }
+  } 
+  return {card: null, distance: Infinity}
+}
+
+var handleDropColumn = function (event, el) {
   console.log(event);
-  console.log(event.srcElement.innerHTML)
+
+  // find element because you can't rely on event.target
+  // because we could be dropping in the margin
+  var el = document.elementFromPoint(event.pageX, event.pageY)
+  console.log(el.dataset.columnId)
+  var columnId = el.dataset.columnId
+  console.log(event.target.innerHTML)
+  // if event.dataTransfer.type == "card"
+  var cardAbove = findClosestCardAbove(event.pageX, event.pageY, el)
+  var cardBelow = findClosestCardBelow(event.pageX, event.pageY, el)
+
+  if (!cardAbove.card) {
+    var pos = "first"
+  } else if(!cardBelow.card) {
+    var pos = "last"
+  } else if (!$(el).hasClass("card")){
+    if (cardAbove.distance < cardBelow.distance) {
+      var pos = cardAbove.card.dataset.order
+    } else {
+      var pos = el.dataset.order
+    }
+  } else {
+    var pos = cardAbove.card.dataset.order
+  }
+  console.log(pos)
+  
+
+  render(kanbanApp(state, {
+    cardMove: {id: event.dataTransfer.id, columnId: columnId}
+  }))
 }
 
 var handleDragStartCard = function (event) {
@@ -85,14 +135,14 @@ var handleDragStartCard = function (event) {
 <script type="text/html" id="kanbanTemplate">
 
   <% _.each(columns, function (column, i) { %>
-    <div class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event)" style="<%= getColumnStyle(columns, i, column, width) %>">
+    <div data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, i, column, width) %>">
       <div class="column-header"><%= column.title %></div>
-      <% _.each(column.cards, function (card) { %>
-        <div class="card" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
+      <% _.each(column.cards, function (card, i) { %>
+        <div class="card card-like" data-order="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
           <%= card.title %> 
         </div> 
       <% }) %>
-        <div class="new-card">
+        <div class="new-card card-like">
           <input type="text" class="new-card-input"> 
         </div> 
     </div> 
