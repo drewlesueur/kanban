@@ -37,6 +37,23 @@
     text-align: center;
     font-size: 26px;
   }
+
+  .card  {
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+    font-size: 18px;
+  }
+
+  .new-card  {
+    margin: 20px;
+    background-color: white;
+  }
+  .new-card-input {
+    padding: 20px;
+    font-size: 18px;
+    width: 100%;
+  }
 </style>
 <script src="underscore.js"></script>
 <script src="zepto.js"></script>
@@ -53,11 +70,18 @@ var getColumnStyle = function (columns, i, column, width) {
 </script>
 
 <script type="text/html" id="kanbanTemplate">
-  <h1>Kanban Board</h1>
 
   <% _.each(columns, function (column, i) { %>
     <div class="column <%= column.id%>" style="<%= getColumnStyle(columns, i, column, width) %>">
       <div class="column-header"><%= column.title %></div>
+      <% _.each(column.cards, function (card) { %>
+        <div class="card">
+          <%= card.title %> 
+        </div> 
+      <% }) %>
+        <div class="new-card">
+          <input type="text" class="new-card-input"> 
+        </div> 
     </div> 
   <% }) %>
   
@@ -93,7 +117,7 @@ var getColumnStyle = function (columns, i, column, width) {
       
       },
       {
-        title: "Done",
+        title: "done",
         id: "done",
         cards: [{title: "create github project for kanban board"}, {title: "listen to enya"}]
       }
