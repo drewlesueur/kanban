@@ -99,7 +99,6 @@ var handleDropColumn = function (event, el) {
 
   // find element because you can't rely on event.target
   // because we could be dropping in the margin
-  debugger
   var el = document.elementFromPoint(event.clientX, event.clientY)
   var columnIndex = el.dataset.columnIndex
   // if event.dataTransfer.type == "card"
