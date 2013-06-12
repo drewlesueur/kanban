@@ -60,7 +60,8 @@
 
 <script>
 var getColumnStyle = function (columns, i, column, width) {
-  var styleWidth = (width / columns.length)
+  // note we are not using the supplied width
+  var styleWidth = (innerWidth / columns.length)
   var styleLeft = i * styleWidth;
   var style="width: " + styleWidth + "px;"
     + " position: absolute; "
@@ -121,7 +122,11 @@ var handleDropColumn = function (event, el) {
 }
 
 var handle = function (event) {
-  render(kanbanApp(state, event))
+  // for now the flow is: events go to server then we render based on
+  // what we get back from the server
+  
+  socket.emit("appEvent", event) // the server has the state
+  //render(kanbanApp(state, event))
 }
 
 var handleDragStartCard = function (event) {
@@ -143,7 +148,7 @@ var handleSumbitCard = function (event, columnId, el) {
 <script type="text/html" id="kanbanTemplate">
 
   <% _.each(columns, function (column, i) { %>
-    <div data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, i, column, width) %>">
+    <div data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, i, column) %>">
       <div class="column-header"><%= column.title %></div>
       <% _.each(column.cards, function (card, i) { %>
         <div class="card card-like" data-order="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
@@ -161,8 +166,7 @@ var handleSumbitCard = function (event, columnId, el) {
 
 </script>
 
-
-
+<script src="socket.io.js"></script>
 <script src="kanban.js"></script>
 </head>
 <body>
@@ -170,38 +174,11 @@ var handleSumbitCard = function (event, columnId, el) {
 
 </body>
 <script>
-  var state = {
-    width: innerWidth,
-    columns: [
-      {
-        title: "todo",
-        id: "todo",
-        cards: [
-          { title: "Make kanban board networked", id: 1}, 
-          { title: "Style kanban board" , id: 2},
-          { title: "sync with redis" , id: 3},
-        ]
-        
-      },
-      {
-        title: "in progress",
-        id: "in-progress",
-        cards: [ {title: "make kanban board locally", id: 4}]
-      
-      },
-      {
-        title: "done",
-        id: "done",
-        cards: [{title: "create github project for kanban board", id: 5}, {title: "listen to enya", id: 6}]
-      },
-      /*{
-        title: "yo",
-        id: "yo",
-        cards: [{title: "create github project for kanban board", id: 5}, {title: "listen to enya", id: 6}]
-      }
-      */
-    ]
-  }
-  bindEvents()
+var socket = io.connect('http://drewles.com:8011');
+socket.emit("my other event", "yoyo")
+socket.on("state", function (state) {
+  render(state)
+})
+bindEvents()
 </script>
 </html>

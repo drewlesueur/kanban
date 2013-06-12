@@ -15,18 +15,8 @@ var render = function (state) {
 
 var bindEvents = function () { 
   $(document).ready(function () {
-    render(kanbanApp(state), {})
+    //render(kanbanApp(state), {})
   })
-
-  $(document).on("mousedown", function (event) {
-    console.log(event.pageX, event.pageY) 
-    console.log(document.elementFromPoint(event.pageX, event.pageY))
-  })
-
-  $(document).on("mousemove", function (event) {
-     
-  })
-
 }
 
 
