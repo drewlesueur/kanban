@@ -53,6 +53,11 @@ var eventHandlers = {
     state.columns[event.deleteCard.columnIndex].cards.splice(pos, 1)
     return state;
   },
+  deleteColumn: function (state, event) {
+    var pos = event.deleteColumn.columnIndex
+    state.columns.splice(pos, 1)
+    return state;
+  },
   addColumn: function (state, event) {
     state.columns.push({
       title: event.addColumn.title,
@@ -87,7 +92,8 @@ var eventHandlers = {
 }
 
 var kanbanApp = function (state, event) {
-  // TODO clean up all these ifs into object
+  // TODO: clean up all these ifs into object ----------
+
   if (event.newCard) {
     state = eventHandlers.newCard(state, event)
   }
@@ -95,6 +101,11 @@ var kanbanApp = function (state, event) {
   if (event.deleteCard) {
     state = eventHandlers.deleteCard(state, event)
   }
+
+  if (event.deleteColumn) {
+    state = eventHandlers.deleteColumn(state, event)
+  }
+
 
   if (event.cardMove) {
     state = eventHandlers.cardMove(state, event)
