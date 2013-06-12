@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+console.log("Content-Type: text/html\n")
+
+fs = require("fs")
+try {
+contents = fs.readFileSync("/home/drew/sites/kanban.drewles.com/index_2.html").toString()
+
+contents = contents.replace("ENTER SITE HERE", process.env.http_path.substr(1) || "default")
+} catch (e) {
+  console.log(e)
+}
+console.log(contents)

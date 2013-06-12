@@ -1,8 +1,13 @@
 //TODO: look at "Operational Transformation" libraries
+// todo playback
+
 _ = require("./underscore.js")
 var io = require('socket.io').listen(8011);
 
-var state = {
+var sites = {
+}
+
+var defaultState = {
   columns: [
     {
       title: "todo",
@@ -42,12 +47,26 @@ var eventHandlers = {
     })
     return state;
   },
+
+  deleteCard: function (state, event) {
+    var pos = event.deleteCard.cardIndex
+    state.columns[event.deleteCard.columnIndex].cards.splice(pos, 1)
+    return state;
+  },
   cardMove: function (state, event) {
-    var fromCards = state.columns[event.cardMove.fromColumnIndex].cards
-    var toCards = state.columns[event.cardMove.toColumnIndex].cards
+    var fromColumnIndex = event.cardMove.fromColumnIndex
+    var toColumnIndex = event.cardMove.toColumnIndex
+    
+    var fromCards = state.columns[fromColumnIndex].cards
+    var toCards = state.columns[toColumnIndex].cards
 
     var fromPos = event.cardMove.fromCardIndex
     var toPos = event.cardMove.toCardIndex
+
+    if (fromColumnIndex == toColumnIndex && toPos >= fromPos) {
+      toPos = toPos - 1
+    }
+
    
     // splice out of fromCards into toCards
     toCards.splice.apply(toCards, [toPos, 0].concat(
@@ -60,20 +79,30 @@ var eventHandlers = {
 }
 
 var kanbanApp = function (state, event) {
+  // TODO clean up all these ifs into object
   if (event.newCard) {
     state = eventHandlers.newCard(state, event)
+  }
+
+  if (event.deleteCard) {
+    state = eventHandlers.deleteCard(state, event)
   }
 
   if (event.cardMove) {
     state = eventHandlers.cardMove(state, event)
   } 
-
+  state.otherBoards = _.keys(sites)
   return state
 }
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('state', state);
+  //socket.emit('state', state);
   socket.on('appEvent', function (event) {
+    var state = sites[event.site]
+    if (!state) {
+      sites[event.site] = JSON.parse(JSON.stringify(defaultState));
+      state = sites[event.site]
+    } 
     io.sockets.emit('state', kanbanApp(state, event)) 
   });
 });
