@@ -124,6 +124,7 @@ var handleDropColumn = function (event, el) {
     fromColumnIndex: globalDataTransfer.columnIndex
   }  
 
+  console.log(info)
   handle({cardMove: info})
 }
 
@@ -159,7 +160,7 @@ var handleSumbitCard = function (event, columnId, columnIndex, el) {
 
   <% _.each(columns, function (column, columnIndex) { %>
     <div data-column-index="<%= columnIndex %>" data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, columnIndex, column) %>">
-      <div class="column-header"><%= column.title %></div>
+      <div class="column-header" data-column-index="<%= columnIndex %>" ><%= column.title %></div>
       <% _.each(column.cards, function (card, i) { %>
         <div class="card card-like" data-column-index="<%= columnIndex %>" data-card-index="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
           <%= card.title %> 
