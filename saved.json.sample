@@ -1,0 +1,83 @@
+{
+ "drew": {
+  "columns": [
+   {
+    "title": "todo",
+    "id": "todo",
+    "cards": [
+     {
+      "title": "Rearrange Columns"
+     },
+     {
+      "title": "card details"
+     },
+     {
+      "title": "cleanup ui"
+     },
+     {
+      "title": "a card view where you can see the details of a card."
+     },
+     {
+      "title": "Get resizing working"
+     },
+     {
+      "title": "ability to edit cards"
+     },
+     {
+      "title": "syncing"
+     },
+     {
+      "title": "edit columns"
+     },
+     {
+      "title": "delete undo"
+     },
+     {
+      "title": "Colors for cards and rules"
+     },
+     {
+      "title": "Make cards like post-it notes and have them flow to fit"
+     },
+     {
+      "title": "Have columns resize widths based on number of cards in each column"
+     }
+    ]
+   },
+   {
+    "title": "in progress",
+    "id": "in-progress",
+    "cards": []
+   },
+   {
+    "title": "done",
+    "id": "done",
+    "cards": [
+     {
+      "title": "have a file to save locally"
+     },
+     {
+      "title": "adding tasks"
+     },
+     {
+      "title": "differet boards cor differnt users"
+     },
+     {
+      "title": "adding and removing columns"
+     },
+     {
+      "title": "show grant the board"
+     },
+     {
+      "title": "save to disc"
+     },
+     {
+      "title": "make sure it reads back from disc"
+     }
+    ]
+   }
+  ],
+  "otherBoards": [
+   "drew"
+  ]
+ }
+}

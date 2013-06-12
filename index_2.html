@@ -190,7 +190,11 @@ var handleSumbitCard = function (event, columnId, columnIndex, el) {
     </div>
     <br />
     <div class="controls" style="display: block;">
-      <a href="javascript:handle({site: site, addColumn: {title: prompt('Column Name?')}})">Add Column</a>
+      <a href="javascript:handle({site: site, addColumn: {title: prompt('Column name?')}})">Add Column</a>
+      <br />
+      <a href="javascript: location.href = 'http://kanban.drewles.com/' + prompt('Board name?')">Create a new board</a>
+      <br />
+      <a href="saved.json" target="_blank" download>Backup</a>
     </div>
   <% } %>
     </div> 
