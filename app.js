@@ -41,13 +41,24 @@ var eventHandlers = {
       id: _.uniqueId("card")
     })
     return state;
-  }    
+  },
+  cardMove: function (state, event) {
+    return state;
+    state.columns[event.cardMove.toColumnIndex].cards.splice(
+      //state.columns[event.]
+    )
+  } 
 }
 
 var kanbanApp = function (state, event) {
   if (event.newCard) {
     state = eventHandlers.newCard(state, event)
-  }  
+  }
+
+  if (event.cardMove) {
+    state = eventHandlers.cardMove(state, event)
+  } 
+
   return state
 }
 

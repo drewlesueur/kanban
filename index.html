@@ -70,55 +70,62 @@ var getColumnStyle = function (columns, i, column, width) {
 }
 
 var findClosestCardAbove = function (x, y, el) {
+  var distance = 0
   for (i = y; i >= 0; i-=5) {
     var newEl = document.elementFromPoint(x, i)
     if (newEl != el && $(newEl).hasClass("card")) {
-      return {card: newEl, distance: i} 
+      return {card: newEl, distance: distance} 
     }
+    distance += 5;
   } 
   return {card: null, distance: Infinity}
 }
 
 var findClosestCardBelow = function (x, y, el) {
   var pageHeight = $(document).height() || 5000
+  var distance = 0;
   for (i = y; i <= pageHeight; i+=5) {
     var newEl = document.elementFromPoint(x, i)
     if (newEl != el && $(newEl).hasClass("card")) {
-      return {card: newEl, distance: i} 
+      return {card: newEl, distance: distance} 
     }
+    distance += 5
   } 
   return {card: null, distance: Infinity}
 }
 
 var handleDropColumn = function (event, el) {
-  console.log(event);
 
   // find element because you can't rely on event.target
   // because we could be dropping in the margin
   var el = document.elementFromPoint(event.pageX, event.pageY)
-  console.log(el.dataset.columnId)
-  var columnId = el.dataset.columnId
-  console.log(event.target.innerHTML)
+  var columnIndex = el.dataset.columnIndex
   // if event.dataTransfer.type == "card"
   var cardAbove = findClosestCardAbove(event.pageX, event.pageY, el)
   var cardBelow = findClosestCardBelow(event.pageX, event.pageY, el)
 
   if (!cardAbove.card) {
-    var pos = "first"
+    var pos = 0
   } else if(!cardBelow.card) {
-    var pos = "last"
-  } else if (!$(el).hasClass("card")){
+    var pos = state.columns[columnIndex].cards.length
+  } else if ($(el).hasClass("card")){
     if (cardAbove.distance < cardBelow.distance) {
-      var pos = cardAbove.card.dataset.order
+      var pos = el.dataset.cardIndex
     } else {
-      var pos = el.dataset.order
+      var pos = cardBelow.card.dataset.cardIndex
     }
   } else {
-    var pos = cardAbove.card.dataset.order
+    var pos = cardBelow.card.dataset.cardIndex
   }
-  console.log(pos)
-  
-  handle({cardMove: {id: event.dataTransfer.id, columnId: columnId}})
+  var info = {
+    toCardIndex: pos, 
+    toColumnIndex: columnIndex,
+    fromCardIndex: globalDataTransfer.cardIndex, 
+    fromColumnIndex: globalDataTransfer.columnIndex
+  }  
+
+  console.log(info)
+  //handle({cardMove: info})
 }
 
 var handle = function (event) {
@@ -129,11 +136,15 @@ var handle = function (event) {
   //render(kanbanApp(state, event))
 }
 
+var globalDataTransfer =  {}
 var handleDragStartCard = function (event) {
   event.dataTransfer.type = "card"
-  console.log(event.target)
-  event.dataTransfer.id = event.target.id
-  console.log(event.dataTransfer)
+
+  //this was working
+  //event.dataTransfer.cardIndex = event.target.dataset.cardIndex
+  //event.dataTransfer.columnIndex = event.target.dataset.columnIndex
+  globalDataTransfer.cardIndex = event.target.dataset.cardIndex
+  globalDataTransfer.columnIndex = event.target.dataset.columnIndex
 }
 
 var handleSumbitCard = function (event, columnId, columnIndex, el) {
@@ -148,16 +159,16 @@ var handleSumbitCard = function (event, columnId, columnIndex, el) {
 <script type="text/html" id="kanbanTemplate">
 
   <% _.each(columns, function (column, columnIndex) { %>
-    <div data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, columnIndex, column) %>">
+    <div data-column-index="<%= columnIndex %>" data-column-id="<%= column.id %>" class="column <%= column.id%>" ondragover="event.preventDefault()" ondrop="handleDropColumn(event, this)" style="<%= getColumnStyle(columns, columnIndex, column) %>">
       <div class="column-header"><%= column.title %></div>
       <% _.each(column.cards, function (card, i) { %>
-        <div class="card card-like" data-order="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
+        <div class="card card-like" data-column-index="<%= columnIndex %>" data-card-index="<%= i %>" draggable="true" id="<%= card.id %>" ondragstart="handleDragStartCard(event)">
           <%= card.title %> 
         </div> 
       <% }) %>
         <div class="new-card card-like">
           <form onsubmit="handleSumbitCard(event, '<%= column.id %>', <%= columnIndex %>, this)">
-          <input type="text" class="new-card-input"> 
+          <input type="text" class="new-card-input" data-column-index="<%= columnIndex %>"> 
         </form>
         </div> 
     </div> 
@@ -176,7 +187,9 @@ var handleSumbitCard = function (event, columnId, columnIndex, el) {
 <script>
 var socket = io.connect('http://drewles.com:8011');
 socket.emit("my other event", "yoyo")
-socket.on("state", function (state) {
+var state
+socket.on("state", function (_state) {
+  state = _state
   render(state)
 })
 bindEvents()
