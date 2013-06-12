@@ -117,10 +117,11 @@ var handleDropColumn = function (event, el) {
   }
   console.log(pos)
   
+  handle({cardMove: {id: event.dataTransfer.id, columnId: columnId}})
+}
 
-  render(kanbanApp(state, {
-    cardMove: {id: event.dataTransfer.id, columnId: columnId}
-  }))
+var handle = function (event) {
+  render(kanbanApp(state, event))
 }
 
 var handleDragStartCard = function (event) {
@@ -129,6 +130,13 @@ var handleDragStartCard = function (event) {
   event.dataTransfer.id = event.target.id
   console.log(event.dataTransfer)
 }
+
+var handleSumbitCard = function (event, columnId, el) {
+  var text = $(el).find(".new-card-input").val()
+  handle({newCard: {columnId: columnId, text: text}})
+  event.preventDefault()
+}
+
 
 </script>
 
@@ -143,7 +151,9 @@ var handleDragStartCard = function (event) {
         </div> 
       <% }) %>
         <div class="new-card card-like">
+          <form onsubmit="handleSumbitCard(event, '<%= column.id %>', this)">
           <input type="text" class="new-card-input"> 
+        </form>
         </div> 
     </div> 
   <% }) %>
